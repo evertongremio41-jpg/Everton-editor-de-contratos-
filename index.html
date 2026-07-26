@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Auditor de Contratos</title>
-<script src="https://js.puter.com/v2/"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body{font-family:'Georgia',serif;background:#f6f3ee;}
@@ -25,7 +24,23 @@
 
   <div class="mb-5 text-center">
     <h1 class="text-2xl font-bold brand tracking-tight">Auditor de Contratos</h1>
-    <p class="text-xs text-gray-500 mono mt-1">Análise com IA real · 100% gratuito</p>
+    <p class="text-xs text-gray-500 mono mt-1">Análise com IA real (Google Gemini) · Gratuito</p>
+  </div>
+
+  <!-- CHAVE DE API -->
+  <div id="cardChave" class="card rounded-2xl p-5 shadow-sm mb-4">
+    <h2 class="font-bold text-sm mb-1 text-gray-700">Chave gratuita do Google Gemini</h2>
+    <p class="text-xs text-gray-500 mb-3 leading-relaxed">
+      Pegue grátis em
+      <a href="https://aistudio.google.com/apikey" target="_blank" class="brand underline">aistudio.google.com/apikey</a>
+      (entra com sua conta Google, sem cartão). Cole a chave abaixo — ela fica salva só no seu celular.
+    </p>
+    <div class="flex gap-2">
+      <input type="password" id="apiKey" placeholder="Cole sua chave aqui (AIza...)"
+        class="flex-1 border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a4a2f]">
+      <button onclick="salvarChave()" class="bg-brand text-white font-semibold px-4 rounded-lg text-sm">Salvar</button>
+    </div>
+    <p id="statusChave" class="text-xs text-gray-500 mt-2"></p>
   </div>
 
   <!-- ANÁLISE -->
@@ -73,6 +88,67 @@
 </div>
 
 <script>
+const MODEL = 'gemini-2.5-flash';
+
+function getChave(){
+  return localStorage.getItem('gemini_api_key') || '';
+}
+
+function salvarChave(){
+  const v = document.getElementById('apiKey').value.trim();
+  const status = document.getElementById('statusChave');
+  if(!v){
+    status.textContent = 'Cole uma chave válida.';
+    status.className = 'text-xs text-red-600 mt-2';
+    return;
+  }
+  localStorage.setItem('gemini_api_key', v);
+  status.textContent = 'Chave salva neste celular ✓';
+  status.className = 'text-xs text-green-700 mt-2';
+  document.getElementById('apiKey').value = '';
+  atualizarCardChave();
+}
+
+function atualizarCardChave(){
+  const chave = getChave();
+  const status = document.getElementById('statusChave');
+  if(chave){
+    status.textContent = 'Chave já salva neste celular ✓ (pode colar outra pra trocar)';
+    status.className = 'text-xs text-green-700 mt-2';
+  }
+}
+
+async function chamarGemini(prompt){
+  const chave = getChave();
+  if(!chave){
+    throw new Error('Cole e salve sua chave gratuita do Google Gemini no campo acima antes de usar.');
+  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': chave
+    },
+    body: JSON.stringify({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }]
+    })
+  });
+
+  if(!resp.ok){
+    let msg = 'Erro HTTP ' + resp.status;
+    try{
+      const errJson = await resp.json();
+      if(errJson && errJson.error && errJson.error.message) msg = errJson.error.message;
+    }catch(e){}
+    throw new Error(msg);
+  }
+
+  const data = await resp.json();
+  const texto = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '(sem resposta)';
+  return texto;
+}
+
 function addBubble(texto, autor){
   const box = document.getElementById('chatBox');
   const div = document.createElement('div');
@@ -119,13 +195,9 @@ ${contrato}
 """`;
 
   try{
-    if(typeof puter === 'undefined'){
-      throw new Error('A biblioteca puter.js não carregou (script bloqueado ou sem internet).');
-    }
-    const resposta = await puter.ai.chat(prompt);
-    conteudo.textContent = typeof resposta === 'string' ? resposta : resposta.message.content;
+    conteudo.textContent = await chamarGemini(prompt);
   }catch(err){
-    conteudo.textContent = 'Erro real (me envie este texto): ' + (err && err.message ? err.message : JSON.stringify(err));
+    conteudo.textContent = 'Erro: ' + (err && err.message ? err.message : String(err));
     console.error(err);
   }finally{
     btn.disabled = false;
@@ -148,16 +220,14 @@ async function enviarPergunta(){
     : '';
 
   try{
-    if(typeof puter === 'undefined'){
-      throw new Error('A biblioteca puter.js não carregou (script bloqueado ou sem internet).');
-    }
-    const resposta = await puter.ai.chat(contexto + 'Pergunta do usuário: ' + pergunta + '\n\nResponda em português, de forma clara e objetiva.');
-    aiBubble.textContent = typeof resposta === 'string' ? resposta : resposta.message.content;
+    aiBubble.textContent = await chamarGemini(contexto + 'Pergunta do usuário: ' + pergunta + '\n\nResponda em português, de forma clara e objetiva.');
   }catch(err){
-    aiBubble.textContent = 'Erro real (me envie este texto): ' + (err && err.message ? err.message : JSON.stringify(err));
+    aiBubble.textContent = 'Erro: ' + (err && err.message ? err.message : String(err));
     console.error(err);
   }
 }
+
+atualizarCardChave();
 </script>
 </body>
 </html>
