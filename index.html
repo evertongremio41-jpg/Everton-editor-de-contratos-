@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Everton Auditor de Contratos</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
   body{font-family:'Georgia',serif;background:#f6f3ee;}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
@@ -51,8 +53,18 @@
         class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a4a2f]">
     </div>
     <div class="mb-4">
-      <label class="block text-xs font-semibold text-gray-600 mb-1">Cole o contrato</label>
-      <textarea id="textoContrato" rows="7" placeholder="Cole o texto do contrato aqui..."
+      <label class="block text-xs font-semibold text-gray-600 mb-1">Cole o contrato ou anexe um arquivo</label>
+
+      <label for="fileContrato" class="flex items-center justify-center gap-2 w-full border-2 border-dashed border-gray-300 rounded-lg py-3 mb-2 text-sm text-gray-500 cursor-pointer hover:border-[#8a4a2f] hover:text-[#8a4a2f] transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0L8 8m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+        </svg>
+        <span id="fileLabel">Anexar arquivo (.txt, .pdf ou .docx)</span>
+      </label>
+      <input type="file" id="fileContrato" accept=".txt,.pdf,.docx" class="hidden" onchange="handleFile(event)">
+      <p id="statusArquivo" class="text-xs mt-1 mb-2"></p>
+
+      <textarea id="textoContrato" rows="7" placeholder="Cole o texto do contrato aqui, ou anexe um arquivo acima..."
         class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a4a2f]"></textarea>
     </div>
     <button onclick="analisarContrato()" id="btnAnalisar"
@@ -160,6 +172,68 @@ function addBubble(texto, autor){
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
   return div;
+}
+
+if(window['pdfjsLib']){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+async function extrairTextoPDF(arrayBuffer){
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let texto = '';
+  for(let i = 1; i <= pdf.numPages; i++){
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    texto += content.items.map(it => it.str).join(' ') + '\n\n';
+  }
+  return texto.trim();
+}
+
+async function extrairTextoDOCX(arrayBuffer){
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  return result.value.trim();
+}
+
+async function handleFile(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const fileLabel = document.getElementById('fileLabel');
+  const statusArquivo = document.getElementById('statusArquivo');
+  const textoContrato = document.getElementById('textoContrato');
+
+  fileLabel.textContent = file.name;
+  statusArquivo.textContent = 'Lendo arquivo...';
+  statusArquivo.className = 'text-xs mt-1 mb-2 text-gray-500';
+
+  try{
+    const ext = file.name.split('.').pop().toLowerCase();
+    let texto = '';
+
+    if(ext === 'txt'){
+      texto = await file.text();
+    } else if(ext === 'pdf'){
+      const buffer = await file.arrayBuffer();
+      texto = await extrairTextoPDF(buffer);
+    } else if(ext === 'docx'){
+      const buffer = await file.arrayBuffer();
+      texto = await extrairTextoDOCX(buffer);
+    } else {
+      throw new Error('Formato não suportado. Use .txt, .pdf ou .docx');
+    }
+
+    if(!texto){
+      throw new Error('Não foi possível extrair texto deste arquivo.');
+    }
+
+    textoContrato.value = texto;
+    statusArquivo.textContent = 'Arquivo carregado ✓ (' + texto.length + ' caracteres)';
+    statusArquivo.className = 'text-xs mt-1 mb-2 text-green-700';
+  }catch(err){
+    statusArquivo.textContent = 'Erro ao ler arquivo: ' + (err && err.message ? err.message : String(err));
+    statusArquivo.className = 'text-xs mt-1 mb-2 text-red-600';
+    fileLabel.textContent = 'Anexar arquivo (.txt, .pdf ou .docx)';
+  }
 }
 
 async function analisarContrato(){
