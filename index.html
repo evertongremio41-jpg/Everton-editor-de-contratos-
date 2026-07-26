@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Auditor de Contratos</title>
+<title>Everton Auditor de Contratos</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body{font-family:'Georgia',serif;background:#f6f3ee;}
@@ -23,15 +23,15 @@
 <div class="w-full max-w-md mt-4">
 
   <div class="mb-5 text-center">
-    <h1 class="text-2xl font-bold brand tracking-tight">Auditor de Contratos</h1>
-    <p class="text-xs text-gray-500 mono mt-1">Análise com IA real (Google Gemini) · Gratuito</p>
+    <h1 class="text-2xl font-bold brand tracking-tight">Everton Auditor de Contratos</h1>
+    <p class="text-xs text-gray-500 mono mt-1">Análise automatizada de cláusulas · Gratuito</p>
   </div>
 
-  <!-- CHAVE DE API -->
+  <!-- CHAVE DE ACESSO -->
   <div id="cardChave" class="card rounded-2xl p-5 shadow-sm mb-4">
-    <h2 class="font-bold text-sm mb-1 text-gray-700">Chave gratuita do Google Gemini</h2>
+    <h2 class="font-bold text-sm mb-1 text-gray-700">Chave de acesso gratuita</h2>
     <p class="text-xs text-gray-500 mb-3 leading-relaxed">
-      Pegue grátis em
+      Gere a sua gratuitamente em
       <a href="https://aistudio.google.com/apikey" target="_blank" class="brand underline">aistudio.google.com/apikey</a>
       (entra com sua conta Google, sem cartão). Cole a chave abaixo — ela fica salva só no seu celular.
     </p>
@@ -57,7 +57,7 @@
     </div>
     <button onclick="analisarContrato()" id="btnAnalisar"
       class="w-full bg-brand text-white font-semibold py-3 rounded-lg text-sm transition">
-      Analisar com IA
+      Analisar Contrato
     </button>
 
     <div id="resultado" class="hidden mt-5 border-t border-gray-200 pt-4">
@@ -118,10 +118,10 @@ function atualizarCardChave(){
   }
 }
 
-async function chamarGemini(prompt){
+async function chamarMecanismo(prompt){
   const chave = getChave();
   if(!chave){
-    throw new Error('Cole e salve sua chave gratuita do Google Gemini no campo acima antes de usar.');
+    throw new Error('Cole e salve sua chave de acesso gratuita no campo acima antes de usar.');
   }
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
   const resp = await fetch(url, {
@@ -175,7 +175,7 @@ async function analisarContrato(){
   }
 
   resultadoDiv.classList.remove('hidden');
-  conteudo.textContent = 'Analisando com IA...';
+  conteudo.textContent = 'Analisando contrato...';
   btn.disabled = true;
   btn.textContent = 'Analisando...';
 
@@ -195,13 +195,13 @@ ${contrato}
 """`;
 
   try{
-    conteudo.textContent = await chamarGemini(prompt);
+    conteudo.textContent = await chamarMecanismo(prompt);
   }catch(err){
     conteudo.textContent = 'Erro: ' + (err && err.message ? err.message : String(err));
     console.error(err);
   }finally{
     btn.disabled = false;
-    btn.textContent = 'Analisar com IA';
+    btn.textContent = 'Analisar Contrato';
   }
 }
 
@@ -212,7 +212,7 @@ async function enviarPergunta(){
   input.value = '';
   addBubble(pergunta, 'user');
 
-  const aiBubble = addBubble('Pensando...', 'ai');
+  const aiBubble = addBubble('Só um momento...', 'ai');
 
   const contrato = document.getElementById('textoContrato').value.trim();
   const contexto = contrato
@@ -220,7 +220,7 @@ async function enviarPergunta(){
     : '';
 
   try{
-    aiBubble.textContent = await chamarGemini(contexto + 'Pergunta do usuário: ' + pergunta + '\n\nResponda em português, de forma clara e objetiva.');
+    aiBubble.textContent = await chamarMecanismo(contexto + 'Pergunta do usuário: ' + pergunta + '\n\nResponda em português, de forma clara e objetiva.');
   }catch(err){
     aiBubble.textContent = 'Erro: ' + (err && err.message ? err.message : String(err));
     console.error(err);
