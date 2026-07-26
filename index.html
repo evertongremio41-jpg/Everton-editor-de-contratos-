@@ -119,10 +119,13 @@ ${contrato}
 """`;
 
   try{
+    if(typeof puter === 'undefined'){
+      throw new Error('A biblioteca puter.js não carregou (script bloqueado ou sem internet).');
+    }
     const resposta = await puter.ai.chat(prompt);
     conteudo.textContent = typeof resposta === 'string' ? resposta : resposta.message.content;
   }catch(err){
-    conteudo.textContent = 'Não foi possível concluir a análise agora. Tente novamente em instantes.';
+    conteudo.textContent = 'Erro real (me envie este texto): ' + (err && err.message ? err.message : JSON.stringify(err));
     console.error(err);
   }finally{
     btn.disabled = false;
@@ -145,10 +148,13 @@ async function enviarPergunta(){
     : '';
 
   try{
+    if(typeof puter === 'undefined'){
+      throw new Error('A biblioteca puter.js não carregou (script bloqueado ou sem internet).');
+    }
     const resposta = await puter.ai.chat(contexto + 'Pergunta do usuário: ' + pergunta + '\n\nResponda em português, de forma clara e objetiva.');
     aiBubble.textContent = typeof resposta === 'string' ? resposta : resposta.message.content;
   }catch(err){
-    aiBubble.textContent = 'Não consegui responder agora. Tente de novo.';
+    aiBubble.textContent = 'Erro real (me envie este texto): ' + (err && err.message ? err.message : JSON.stringify(err));
     console.error(err);
   }
 }
