@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Everton Auditor de Contratos</title>
+<title>Everton Auditor de Contratos - Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -22,11 +22,11 @@
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center text-gray-800">
 
-<div class="w-full max-w-md mt-4">
+<div class="w-full max-w-lg mt-4">
 
   <div class="mb-5 text-center">
     <h1 class="text-2xl font-bold brand tracking-tight">Everton Auditor de Contratos</h1>
-    <p class="text-xs text-gray-500 mono mt-1">Análise automatizada de cláusulas · Gratuito</p>
+    <p class="text-xs text-gray-500 mono mt-1">Auditoria Inteligente & Blindagem de Acordos</p>
   </div>
 
   <!-- CHAVE DE ACESSO -->
@@ -34,8 +34,7 @@
     <h2 class="font-bold text-sm mb-1 text-gray-700">Chave de acesso gratuita</h2>
     <p class="text-xs text-gray-500 mb-3 leading-relaxed">
       Gere a sua gratuitamente em
-      <a href="https://aistudio.google.com/apikey" target="_blank" class="brand underline">aistudio.google.com/apikey</a>
-      (entra com sua conta Google, sem cartão). Cole a chave abaixo — ela fica salva só no seu celular.
+      <a href="https://aistudio.google.com/apikey" target="_blank" class="brand underline">aistudio.google.com/apikey</a>. Cole a chave abaixo — ela fica salva só no seu celular.
     </p>
     <div class="flex gap-2">
       <input type="password" id="apiKey" placeholder="Cole sua chave aqui (AIza...)"
@@ -48,8 +47,8 @@
   <!-- ANÁLISE -->
   <div class="card rounded-2xl p-5 shadow-sm">
     <div class="mb-3">
-      <label class="block text-xs font-semibold text-gray-600 mb-1">Sua profissão</label>
-      <input type="text" id="profissao" placeholder="Ex: Designer, Desenvolvedor..."
+      <label class="block text-xs font-semibold text-gray-600 mb-1">Sua profissão / Atuação</label>
+      <input type="text" id="profissao" placeholder="Ex: Desenvolvedor Front-end, Designer UI, Redator..."
         class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a4a2f]">
     </div>
     <div class="mb-4">
@@ -69,25 +68,22 @@
     </div>
     <button onclick="analisarContrato()" id="btnAnalisar"
       class="w-full bg-brand text-white font-semibold py-3 rounded-lg text-sm transition">
-      Analisar Contrato
+      Analisar e Blindar Contrato
     </button>
 
     <div id="resultado" class="hidden mt-5 border-t border-gray-200 pt-4">
-      <h2 class="font-bold text-sm mb-2 text-gray-700">Resultado da análise</h2>
+      <h2 class="font-bold text-sm mb-2 text-gray-700">Resultado da Auditoria</h2>
       <div id="conteudoResultado" class="text-sm leading-relaxed whitespace-pre-wrap"></div>
 
       <div id="acoesResultado" class="hidden flex flex-wrap gap-2 mt-4 pt-3 border-t border-gray-100">
         <button onclick="copiarResultado()" class="flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          Copiar
+          Copiar Relatório
         </button>
         <button onclick="exportarWord()" class="flex items-center gap-1.5 text-xs font-semibold text-white bg-[#2b579a] hover:bg-[#204474] px-3 py-2 rounded-lg transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0L8 8m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
           Abrir no Word
         </button>
-        <button onclick="compartilharResultado()" class="flex items-center gap-1.5 text-xs font-semibold text-white bg-brand hover:opacity-90 px-3 py-2 rounded-lg transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342a4 4 0 100-2.684m0 2.684a4 4 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a4 4 0 105.98-2.98 4 4 0 00-5.98 2.98zm0 12.632a4 4 0 105.98 2.98 4 4 0 00-5.98-2.98z"/></svg>
-          Compartilhar
+        <button onclick="gerarMensagemWhatsApp()" class="flex items-center gap-1.5 text-xs font-semibold text-white bg-green-700 hover:bg-green-800 px-3 py-2 rounded-lg transition">
+          Gerar Texto p/ WhatsApp (Negociação)
         </button>
         <p id="statusExportar" class="text-xs w-full mt-1"></p>
       </div>
@@ -96,13 +92,13 @@
 
   <!-- CHAT LIVRE -->
   <div class="card rounded-2xl p-5 shadow-sm mt-4">
-    <h2 class="font-bold text-sm mb-1 text-gray-700">Tire qualquer dúvida</h2>
-    <p class="text-xs text-gray-500 mb-3">Pergunte sobre o contrato ou qualquer outro assunto.</p>
+    <h2 class="font-bold text-sm mb-1 text-gray-700">Tire qualquer dúvida sobre o contrato</h2>
+    <p class="text-xs text-gray-500 mb-3">Converse com o assistente sobre prazos, multas ou obrigações.</p>
 
     <div id="chatBox" class="space-y-2 mb-3 max-h-72 overflow-y-auto pr-1"></div>
 
     <div class="flex gap-2">
-      <input type="text" id="chatInput" placeholder="Digite sua pergunta..."
+      <input type="text" id="chatInput" placeholder="Ex: O que acontece se eu atrasar 2 dias?"
         class="flex-1 border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a4a2f]"
         onkeydown="if(event.key==='Enter')enviarPergunta()">
       <button onclick="enviarPergunta()"
@@ -116,7 +112,7 @@
 </div>
 
 <script>
-const MODEL = 'gemini-3.6-flash';
+const MODEL = 'gemini-2.5-flash';
 
 function getChave(){
   return localStorage.getItem('gemini_api_key') || '';
@@ -131,7 +127,7 @@ function salvarChave(){
     return;
   }
   localStorage.setItem('gemini_api_key', v);
-  status.textContent = 'Chave salva neste celular ✓';
+  status.textContent = 'Chave salva neste celular/navegador ✓';
   status.className = 'text-xs text-green-700 mt-2';
   document.getElementById('apiKey').value = '';
   atualizarCardChave();
@@ -141,7 +137,7 @@ function atualizarCardChave(){
   const chave = getChave();
   const status = document.getElementById('statusChave');
   if(chave){
-    status.textContent = 'Chave já salva neste celular ✓ (pode colar outra pra trocar)';
+    status.textContent = 'Chave salva ✓ (pode colar outra pra trocar)';
     status.className = 'text-xs text-green-700 mt-2';
   }
 }
@@ -243,7 +239,7 @@ async function handleFile(event){
     }
 
     textoContrato.value = texto;
-    statusArquivo.textContent = 'Arquivo carregado ✓ (' + texto.length + ' caracteres)';
+    statusArquivo.textContent = 'Arquivo carregado com sucesso ✓ (' + texto.length + ' caracteres)';
     statusArquivo.className = 'text-xs mt-1 mb-2 text-green-700';
   }catch(err){
     statusArquivo.textContent = 'Erro ao ler arquivo: ' + (err && err.message ? err.message : String(err));
@@ -256,17 +252,17 @@ function copiarResultado(){
   const texto = document.getElementById('conteudoResultado').textContent;
   const status = document.getElementById('statusExportar');
   navigator.clipboard.writeText(texto).then(() => {
-    status.textContent = 'Texto copiado ✓';
+    status.textContent = 'Relatório copiado ✓';
     status.className = 'text-xs w-full mt-1 text-green-700';
   }).catch(() => {
-    status.textContent = 'Não foi possível copiar. Selecione e copie manualmente.';
+    status.textContent = 'Não foi possível copiar.';
     status.className = 'text-xs w-full mt-1 text-red-600';
   });
 }
 
 function exportarWord(){
   const texto = document.getElementById('conteudoResultado').textContent;
-  const titulo = 'Análise de Contrato - Everton Auditor de Contratos';
+  const titulo = 'Auditoria de Contrato - Everton Auditor';
 
   const htmlParagrafos = texto
     .split('\n')
@@ -285,36 +281,32 @@ ${htmlParagrafos}
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'analise-contrato.doc';
+  a.download = 'relatorio-auditoria.doc';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
   const status = document.getElementById('statusExportar');
-  status.textContent = 'Arquivo .doc baixado — abra com o Word ✓';
+  status.textContent = 'Arquivo .doc baixado com sucesso ✓';
   status.className = 'text-xs w-full mt-1 text-green-700';
 }
 
-async function compartilharResultado(){
-  const texto = document.getElementById('conteudoResultado').textContent;
+async function gerarMensagemWhatsApp(){
+  const contrato = document.getElementById('textoContrato').value.trim();
   const status = document.getElementById('statusExportar');
+  status.textContent = 'Gerando mensagem de negociação...';
+  status.className = 'text-xs w-full mt-1 text-gray-500';
 
-  if(navigator.share){
-    try{
-      await navigator.share({ title: 'Análise de Contrato', text: texto });
-      status.textContent = 'Compartilhado ✓';
-      status.className = 'text-xs w-full mt-1 text-green-700';
-    }catch(err){
-      if(err.name !== 'AbortError'){
-        status.textContent = 'Não foi possível compartilhar.';
-        status.className = 'text-xs w-full mt-1 text-red-600';
-      }
-    }
-  } else {
-    copiarResultado();
-    status.textContent = 'Compartilhamento não suportado aqui — texto copiado para você colar onde quiser ✓';
+  try{
+    const prompt = `Com base nas cláusulas perigosas ou abusivas do contrato abaixo, escreva uma mensagem cordial, profissional e firme para ser enviada por WhatsApp ao cliente/contratante. A mensagem deve propor amigavelmente ajustes nas cláusulas problemáticas (como prazos, multas ou escopo) defendendo os interesses do prestador sem parecer conflituosa.\n\nContrato:\n"""${contrato}"""`;
+    const mensagem = await chamarMecanismo(prompt);
+    navigator.clipboard.writeText(mensagem);
+    status.textContent = 'Mensagem para WhatsApp gerada e copiada para a área de transferência! ✓';
     status.className = 'text-xs w-full mt-1 text-green-700';
+  }catch(err){
+    status.textContent = 'Erro ao gerar mensagem: ' + err.message;
+    status.className = 'text-xs w-full mt-1 text-red-600';
   }
 }
 
@@ -326,26 +318,26 @@ async function analisarContrato(){
   const btn = document.getElementById('btnAnalisar');
 
   if(!profissao || !contrato){
-    alert('Preencha a profissão e cole o contrato.');
+    alert('Preencha a profissão e insira o contrato.');
     return;
   }
 
   resultadoDiv.classList.remove('hidden');
   document.getElementById('acoesResultado').classList.add('hidden');
   document.getElementById('statusExportar').textContent = '';
-  conteudo.textContent = 'Analisando contrato...';
+  conteudo.textContent = 'Analisando contrato e buscando armadilhas...';
   btn.disabled = true;
   btn.textContent = 'Analisando...';
 
-  const prompt = `Você é um assistente jurídico que ajuda profissionais autônomos (freelancers) a entender contratos antes de assinar. NÃO é advogado e deve deixar isso claro.
+  const prompt = `Você é um assistente de auditoria de contratos especialista em proteger profissionais autônomos.
 
-Profissão de quem vai assinar: ${profissao}
+Profissão do usuário: ${profissao}
 
-Analise o contrato abaixo e responda em português, de forma direta e organizada, com:
-1. Nível de risco geral (Baixo, Médio ou Alto) e por quê.
-2. Lista das cláusulas problemáticas ou que merecem atenção (exclusividade sem remuneração, cessão total de direitos autorais, prazos de pagamento longos, multas desproporcionais, rescisão unilateral, etc.), explicando cada uma em 1-2 frases simples.
-3. Sugestões práticas do que negociar antes de assinar.
-4. Um lembrete de que isso não substitui um advogado.
+Analise detalhadamente o contrato abaixo e forneça:
+1. **Nível de Risco Geral:** (Baixo, Médio ou Alto) acompanhado de uma justificativa objetiva.
+2. **Cláusulas de Atenção (Armadilhas):** Liste os pontos mais críticos (multas abusivas, escopo aberto, prazos longos de pagamento, exclusividade sem remuneração adequada) explicando o risco.
+3. **Sugestão de Nova Redação (Auto-Patch):** Para cada cláusula problemática encontrada, forneça uma sugestão exata de reescrita em texto jurídico seguro para o profissional propor ao cliente.
+4. **Aviso Legal:** Lembrete claro de que esta ferramenta auxilia na análise mas não substitui um advogado.
 
 Contrato:
 """
@@ -356,11 +348,11 @@ ${contrato}
     conteudo.textContent = await chamarMecanismo(prompt);
     document.getElementById('acoesResultado').classList.remove('hidden');
   }catch(err){
-    conteudo.textContent = 'Erro: ' + (err && err.message ? err.message : String(err));
+    conteudo.textContent = 'Erro na análise: ' + (err && err.message ? err.message : String(err));
     console.error(err);
   }finally{
     btn.disabled = false;
-    btn.textContent = 'Analisar Contrato';
+    btn.textContent = 'Analisar e Blindar Contrato';
   }
 }
 
@@ -371,15 +363,15 @@ async function enviarPergunta(){
   input.value = '';
   addBubble(pergunta, 'user');
 
-  const aiBubble = addBubble('Só um momento...', 'ai');
+  const aiBubble = addBubble('Analisando sua dúvida...', 'ai');
 
   const contrato = document.getElementById('textoContrato').value.trim();
   const contexto = contrato
-    ? `Contexto: o usuário está analisando o seguinte contrato:\n"""${contrato}"""\n\n`
+    ? `Contexto do contrato analisado:\n"""${contrato}"""\n\n`
     : '';
 
   try{
-    aiBubble.textContent = await chamarMecanismo(contexto + 'Pergunta do usuário: ' + pergunta + '\n\nResponda em português, de forma clara e objetiva.');
+    aiBubble.textContent = await chamarMecanismo(contexto + 'Dúvida do usuário: ' + pergunta + '\n\nResponda em português de forma clara e objetiva.');
   }catch(err){
     aiBubble.textContent = 'Erro: ' + (err && err.message ? err.message : String(err));
     console.error(err);
