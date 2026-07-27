@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Everton Auditor de Contratos - Pro</title>
+<title>Everton Auditor de Contratos - Groq Edition</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -26,18 +26,18 @@
 
   <div class="mb-5 text-center">
     <h1 class="text-2xl font-bold brand tracking-tight">Everton Auditor de Contratos</h1>
-    <p class="text-xs text-gray-500 mono mt-1">Auditoria Inteligente & Blindagem de Acordos</p>
+    <p class="text-xs text-gray-500 mono mt-1">Auditoria Inteligente com Groq API</p>
   </div>
 
-  <!-- CHAVE DE ACESSO -->
+  <!-- CHAVE DE ACESSO GROQ -->
   <div id="cardChave" class="card rounded-2xl p-5 shadow-sm mb-4">
-    <h2 class="font-bold text-sm mb-1 text-gray-700">Chave de acesso gratuita</h2>
+    <h2 class="font-bold text-sm mb-1 text-gray-700">Chave de acesso Groq</h2>
     <p class="text-xs text-gray-500 mb-3 leading-relaxed">
       Gere a sua gratuitamente em
-      <a href="https://aistudio.google.com/apikey" target="_blank" class="brand underline">aistudio.google.com/apikey</a>. Cole a chave abaixo — ela fica salva só no seu celular.
+      <a href="https://console.groq.com/keys" target="_blank" class="brand underline">console.groq.com/keys</a>. Cole a chave abaixo — ela fica salva só no seu navegador.
     </p>
     <div class="flex gap-2">
-      <input type="password" id="apiKey" placeholder="Cole sua chave aqui (AIza...)"
+      <input type="password" id="apiKey" placeholder="Cole sua chave aqui (gsk_...)"
         class="flex-1 border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a4a2f]">
       <button onclick="salvarChave()" class="bg-brand text-white font-semibold px-4 rounded-lg text-sm">Salvar</button>
     </div>
@@ -112,22 +112,23 @@
 </div>
 
 <script>
-const MODEL = 'gemini-2.5-flash';
+// Usando o modelo rápido e inteligente da Groq
+const MODEL = 'llama-3.3-70b-versatile';
 
 function getChave(){
-  return localStorage.getItem('gemini_api_key') || '';
+  return localStorage.getItem('groq_api_key') || '';
 }
 
 function salvarChave(){
   const v = document.getElementById('apiKey').value.trim();
   const status = document.getElementById('statusChave');
   if(!v){
-    status.textContent = 'Cole uma chave válida.';
+    status.textContent = 'Cole uma chave válida da Groq.';
     status.className = 'text-xs text-red-600 mt-2';
     return;
   }
-  localStorage.setItem('gemini_api_key', v);
-  status.textContent = 'Chave salva neste celular/navegador ✓';
+  localStorage.setItem('groq_api_key', v);
+  status.textContent = 'Chave da Groq salva com sucesso ✓';
   status.className = 'text-xs text-green-700 mt-2';
   document.getElementById('apiKey').value = '';
   atualizarCardChave();
@@ -145,17 +146,19 @@ function atualizarCardChave(){
 async function chamarMecanismo(prompt){
   const chave = getChave();
   if(!chave){
-    throw new Error('Cole e salve sua chave de acesso gratuita no campo acima antes de usar.');
+    throw new Error('Cole e salve sua chave de acesso da Groq no campo acima antes de usar.');
   }
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+  const url = 'https://api.groq.com/openai/v1/chat/completions';
   const resp = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-goog-api-key': chave
+      'Authorization': `Bearer ${chave}`
     },
     body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }]
+      model: MODEL,
+      messages: [{ role: 'user', content: prompt }]
     })
   });
 
@@ -169,7 +172,7 @@ async function chamarMecanismo(prompt){
   }
 
   const data = await resp.json();
-  const texto = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '(sem resposta)';
+  const texto = data?.choices?.[0]?.message?.content || '(sem resposta)';
   return texto;
 }
 
@@ -262,7 +265,7 @@ function copiarResultado(){
 
 function exportarWord(){
   const texto = document.getElementById('conteudoResultado').textContent;
-  const titulo = 'Auditoria de Contrato - Everton Auditor';
+  const titulo = 'Auditoria de Contrato - Everton Auditor (Groq)';
 
   const htmlParagrafos = texto
     .split('\n')
@@ -325,7 +328,7 @@ async function analisarContrato(){
   resultadoDiv.classList.remove('hidden');
   document.getElementById('acoesResultado').classList.add('hidden');
   document.getElementById('statusExportar').textContent = '';
-  conteudo.textContent = 'Analisando contrato e buscando armadilhas...';
+  conteudo.textContent = 'Analisando contrato velozmente via Groq...';
   btn.disabled = true;
   btn.textContent = 'Analisando...';
 
